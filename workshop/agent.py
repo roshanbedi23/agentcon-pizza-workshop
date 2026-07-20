@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from azure.identity import DefaultAzureCredential
 from azure.ai.projects import AIProjectClient
 from azure.ai.projects.models import PromptAgentDefinition
+from pathlib import Path
 
 load_dotenv()
 
@@ -13,11 +14,13 @@ project_client = AIProjectClient(
 
 openai_client = project_client.get_openai_client()
 
+instructions_file = Path(__file__).parent / "instructions.txt"
+
 agent = project_client.agents.create_version(
     agent_name="pizza-agent",
     definition=PromptAgentDefinition(
         model=os.environ["MODEL_DEPLOYMENT_NAME"],
-        instructions=open("instructions.txt").read(),
+        instructions=instructions_file.read_text(),
     ),
 )
 print(f"Agent created (id: {agent.id}, name: {agent.name}, version: {agent.version})")
